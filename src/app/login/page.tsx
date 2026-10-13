@@ -1,5 +1,5 @@
 'use client'
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { FcGoogle } from "react-icons/fc";
@@ -11,8 +11,7 @@ function Login() {
   // hook
 
   const router = useRouter()
-  const session = useSession()
-  console.log(session?.data?.user)
+
 
   // fetching API,s
 
@@ -20,10 +19,9 @@ function Login() {
     e.preventDefault()
 try {
   const result = await signIn('credentials',{
-  email,password
+  email,password,redirect:false
   });
-  console.log(result)
-  alert('User login successfully')
+  router.push('/')
 } catch (error) {
   console.log(error)
 
@@ -57,7 +55,12 @@ try {
               <hr className=' grow border-gray-500 ' />
             </div>
 
-            <button className='w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-400 rounded-lg bg-white text-black hover:bg-gray-100 trasition-colors ' ><FcGoogle /><span>Sign In With Google </span></button>
+            <button className='w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-400 rounded-lg bg-white text-black hover:bg-gray-100 trasition-colors ' onClick={async ()=> {
+              await signIn('google' , {
+               callbackUrl:'/'
+              })
+              
+              }} ><FcGoogle /><span>Sign In With Google </span></button>
 
 
       </div>

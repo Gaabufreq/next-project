@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import connectDB from "./db"
 import User from "@/models/user.model"
 import bcrypt from "bcryptjs"
+import Google from "next-auth/providers/google"
 
 
 const authOptions:NextAuthOptions={
@@ -43,10 +44,34 @@ providers:[
             }
 
         },
+    }),
+
+    Google ({
+        clientId:process.env.GOOGLE_CLIENT_ID!,
+        clientSecret:process.env.GOOGLE_CLIENT_SECRET!
     })
 
 ],
 callbacks:{
+
+    async signIn({account , user}) {
+
+        if(account?.provider=='google'){
+            await connectDB()
+            let existUser = await User.findOne({email:user?.email})
+            if(!existUser){
+                 existUser = await User.create({
+                    name:user.name,
+                    email:user?.email
+                })
+            }
+            user.id = existUser._id as string
+        }
+        return true
+
+    },
+
+
     // token ke andar user details daal raha hai
     async jwt({token,user}) {
     if(user){
